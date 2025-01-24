@@ -86,13 +86,33 @@ export default function App() {
         });
     }
 
+    function sendPushNotificationHandler() {
+        fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Accept-encoding': 'gzip, deflate',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                to: 'ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]',
+                title: 'Push Notification',
+                body: 'This is a push notification!',
+                data: { username: 'Badi' },
+            }),
+        });
+    }
+
     return (
         <View style={styles.container}>
             <StatusBar style="auto" />
-            <Button
-                title="Schedule Local Notification"
-                onPress={scheduleLocalNotificationHandler}
-            />
+            <View style={{ gap: 20 }}>
+                <Button
+                    title="Schedule Local Notification"
+                    onPress={scheduleLocalNotificationHandler}
+                />
+                <Button title="Send Push Notification" onPress={sendPushNotificationHandler} />
+            </View>
         </View>
     );
 }
