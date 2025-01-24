@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button, StyleSheet, View } from 'react-native';
+import { Alert, Button, Platform, StyleSheet, View } from 'react-native';
 
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
@@ -15,6 +15,41 @@ Notifications.setNotificationHandler({
 });
 
 export default function App() {
+    useEffect(() => {
+        async function configurePushNotifications() {
+            const { status } = await Notifications.getPermissionsAsync();
+            let finalStatus = status;
+
+            if (finalStatus !== 'granted') {
+                const { status } = await Notifications.requestPermissionsAsync();
+                finalStatus = status;
+            }
+
+            if (finalStatus !== 'granted') {
+                Alert.alert(
+                    'Permission not granted',
+                    'Please enable push notifications in your settings'
+                );
+                return;
+            }
+
+            const token = await Notifications.getExpoPushTokenAsync();
+
+            console.log(token.data);
+
+            if (Platform.OS === 'android') {
+                Notifications.setNotificationChannelAsync('default', {
+                    name: 'default',
+                    importance: Notifications.AndroidImportance.HIGH,
+                    vibrationPattern: [0, 250, 250, 250],
+                    lightColor: '#FF231F7C',
+                });
+            }
+        }
+
+        configurePushNotifications();
+    }, []);
+
     useEffect(() => {
         const receivedSubscription = Notifications.addNotificationReceivedListener(
             (notification) => {
